@@ -2,7 +2,7 @@
 <settings>
   <servers>
     <server>
-      <id>ConnectedApps</id>
+      <id>MuleRepository</id>
       <username>~~~Token~~~</username>
       <password>${authToken}</password>
     </server>
