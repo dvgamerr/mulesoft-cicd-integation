@@ -2,16 +2,9 @@
 <settings>
   <servers>
     <server>
-      <id>MuleRepository</id>
-      <connectedAppClientId>${env.CLIENT_ID}</connectedAppClientId>
-      <connectedAppClientSecret>${env.CLIENT_SECRET}</connectedAppClientSecret>
-      <connectedAppGrantType>client_credentials</connectedAppGrantType>
-    </server>
-    <server>
-      <id>anypoint-exchange-v3</id>
-      <connectedAppClientId>${env.CLIENT_ID}</connectedAppClientId>
-      <connectedAppClientSecret>${env.CLIENT_SECRET}</connectedAppClientSecret>
-      <connectedAppGrantType>client_credentials</connectedAppGrantType>
+      <id>ConnectedApps</id>
+      <username>~~~Token~~~</username>
+      <password>${authToken}</password>
     </server>
   </servers>
   <pluginGroups>
