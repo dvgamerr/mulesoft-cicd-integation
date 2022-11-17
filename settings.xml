@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<settings>
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
   <servers>
     <server>
       <id>MuleRepository</id>
@@ -52,7 +54,20 @@
             <enabled>true</enabled>
           </snapshots>
         </repository>
+         <repository>
+          <id>mule-public</id>
+          <name>mule-public</name>
+          <url>https://repository.mulesoft.org/nexus/content/repositories/public</url>
+          <layout>default</layout>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>         
       </repositories>
+
     </profile>
   </profiles>
 </settings>
