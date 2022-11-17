@@ -70,7 +70,7 @@ jobs:
                 {
                   "id": "anypoint-exchange-v2",
                   "username": "~~~Token~~~",
-                  "password": ${{ env.ACCESS_TOKEN }},
+                  "password": "1a602cfe-cb20-42c7-92ca-a6f870a75e6e",
                   "configuration": {
                     "httpConfiguration": {
                       "all": {
