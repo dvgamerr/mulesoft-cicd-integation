@@ -6,6 +6,11 @@
       <username>~~~Token~~~</username>
       <password>${authToken}</password>
     </server>
+    <server>
+      <id>anypoint-exchange-v3</id>
+      <username>~~~Token~~~</username>
+      <password>${authToken}</password>
+    </server>
   </servers>
   <pluginGroups>
     <pluginGroup>org.mule.tools</pluginGroup>
