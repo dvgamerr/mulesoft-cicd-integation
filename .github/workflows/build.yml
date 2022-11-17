@@ -7,9 +7,6 @@ on:
 
   workflow_dispatch:
     inputs:
-      environment:
-        type: environment
-        description: Select the environment
       env:
         type: choice
         description: Select the environment
@@ -52,7 +49,7 @@ jobs:
         cache: 'maven'
 
     - name: Build
-      run: mvn -B deploy -DmuleDeploy -s .maven/settings.xml
+      run: mvn -B deploy -DmuleDeploy -s settings.xml
     
     - name: Deploy package
       run: ls target/*.jar
