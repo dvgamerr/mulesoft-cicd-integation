@@ -44,14 +44,14 @@ jobs:
     - name: Fixed data-format-converter-action write to pom.josn
       run: echo '${{ steps.convert.outputs.output }}' > pom.json
       shell: sh
-        
-    - name: Print Result
-      run: cat pom.json 
-      
-    - name: Get API Version in dependency
+
+    - name: Set Environment Name
       run: |
-        version=$(cat pom.json | jq '.project.dependencies.dependency[] | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
-        echo "API_VERSION=$version" >> $GITHUB_ENV
+        version=v$(cat pom.json | jq '.project.dependencies.dependency[] | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
+        repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-$version-build.${{ github.ref_name }}#${{ github.run_id }}
+        
+        echo "EXCHANGE_VERSION=$version" >> $GITHUB_ENV
+        echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
 
     - name: Install anypoint-cli-v4 and Config
       run: |
@@ -86,7 +86,8 @@ jobs:
     - name: artifact scdp-cicd-integation
       # if: github.ref_name != "main"
       run: |
-        repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-${{ github.ref_name }}-build.${{ github.run_id }}
+        repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-${{ env.API_VERSION }}-build.${{ github.ref_name }}-${{ github.run_id }}
+        echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
         mv $(ls ./target/*.jar) ./target/$repo_name.jar
         ls -al ./target/*.jar
         echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
