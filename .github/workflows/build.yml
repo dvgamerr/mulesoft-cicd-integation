@@ -50,7 +50,7 @@ jobs:
       
     - name: Get API Version in dependency
       run: |
-        version=$(cat pom.json | jq '.project.dependencies.dependency | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
+        version=$(cat pom.json | jq '.project.dependencies.dependency[] | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
         echo "API_VERSION=$version" >> $GITHUB_ENV
 
     - name: Install anypoint-cli-v4 and Config
