@@ -33,15 +33,11 @@ jobs:
 
     - name: Convert pom.xml to json
       uses: fabasoad/data-format-converter-action@main
-      id: yaml2json
-      with:
-        input: ./pom.xml
-        from: xml
-        to: json
 
     - name: Print result
       run: |
-        cat .data-format-converter-action | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
+        yq -P './pom.xml' -p=xml -o=json > pom.json
+        cat pom.json | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
 
     # - name: Setup jdk8
     #   uses: actions/setup-java@v3
