@@ -41,11 +41,12 @@ jobs:
         input: ./pom.xml
         from: xml
         to: json
-
-    - name: Print result
+    - name: Fixed data-format-converter-action write to pom.josn
       shell: sh
+      run: echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
+        
+    - name: Get API Version in dependency
       run: |
-        echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
         version=$(cat pom.json | jq '.project.dependencies.dependency | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
         echo "API_VERSION=$version" >> $GITHUB_ENV
 
