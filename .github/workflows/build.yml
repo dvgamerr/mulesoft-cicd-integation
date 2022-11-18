@@ -46,7 +46,8 @@ jobs:
       shell: sh
       run: |
         echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
-        cat pom.json | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
+        version=$(cat pom.json | jq '.project.dependencies.dependency | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
+        echo "API_VERSION=$version" >> $GITHUB_ENV
 
     - name: Install anypoint-cli-v4 and Config
       run: |
