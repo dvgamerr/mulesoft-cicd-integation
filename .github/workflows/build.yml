@@ -34,18 +34,18 @@ jobs:
         path: ./mule-domain
         ref: main
 
-    - name: Convert pom.xml to json
-      uses: fabasoad/data-format-converter-action@main
-      id: yaml2json
-      with:
-        input: ./pom.xml
-        from: xml
-        to: json
+    # - name: Convert pom.xml to json
+    #   uses: fabasoad/data-format-converter-action@main
+    #   id: yaml2json
+    #   with:
+    #     input: ./pom.xml
+    #     from: xml
+    #     to: json
 
-    - name: Print result
-      run: |
-        echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
-        cat pom.json | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
+    # - name: Print result
+    #   run: |
+    #     echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
+    #     cat pom.json | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
 
     - name: Install anypoint-cli-v4 and Config
       run: |
@@ -54,45 +54,47 @@ jobs:
         anypoint-cli-v4 conf client_secret ${{ env.CLIENT_SECRET }}
         anypoint-cli-v4 conf organization ${{ env.ORGANIZATION_ID }}
         anypoint-cli-v4 conf environment ${{ env.ENVIRONMENT }}
-    
+
+    - name: Setup jdk8
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '8'
+
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: Build mule-domain
+      run: |
+        cd ./mule-domain
+        mvn clean package install -f pom.xml
+
+    - name: Build scdp-cicd-integation
+      run: |
+        mvn clean package -f pom.xml -s settings.xml
+
+    - name: artifact scdp-cicd-integation
+      # if: github.ref_name != "main"
+      run: |
+        repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-${{ github.ref_name }}-build.${{ github.run_id }}
+        mv $(ls ./target/*.jar) ./target/$repo_name.jar
+        ls -al ./target/*.jar
+        echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
+
+    - name: Deploy package
+      # if: github.ref_name != "main"
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.REPO_NAME }}.jar
+        path: ./target/${{ env.REPO_NAME }}.jar
+
     - name: Deploy Aticatct to CouldAppilication
+      # if: github.ref_name != "main"
       run: |
         echo anypoint-cli-v4 runtime-mgr:cloudhub-application:modify \
         ${{ env.APP_ID }} \
         ./target/v2-scgp-cicd-integation-1.0.0-SNAPSHOT-mule-application.jar -o json
-    # - name: Setup jdk8
-    #   uses: actions/setup-java@v3
-    #   with:
-    #     distribution: 'temurin'
-    #     java-version: '8'
-
-    # - uses: actions/cache@v1
-    #   with:
-    #     path: ~/.m2/repository
-    #     key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-maven-
-
-    # - name: Build mule-domain
-    #   run: |
-    #     cd ./mule-domain
-    #     mvn clean package install -f pom.xml
-
-    # - name: Build scdp-cicd-integation
-    #   run: |
-    #     mvn clean package -f pom.xml -s settings.xml
-
-    # - name: artifact scdp-cicd-integation
-    #   if: github.ref_name != "main"
-    #   run: |
-    #     repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-${{ github.ref_name }}-build.${{ github.run_id }}
-    #     mv $(ls ./target/*.jar) ./target/$repo_name.jar
-    #     ls -al ./target/*.jar
-    #     echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
-
-    # - name: Deploy package
-    #   if: github.ref_name != "main"
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: ${{ env.REPO_NAME }}.jar
-    #     path: ./target/${{ env.REPO_NAME }}.jar
