@@ -40,40 +40,41 @@ jobs:
         to: json
 
     - name: Print result
-      run: echo "${{ steps.yaml2json.outputs.output }}" | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}") | .version'
+      run: echo '${{ steps.yaml2json.outputs.output }}' | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}") | .version'
 
-    - name: Setup jdk8
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '8'
+    # - name: Setup jdk8
+    #   uses: actions/setup-java@v3
+    #   with:
+    #     distribution: 'temurin'
+    #     java-version: '8'
 
-    - uses: actions/cache@v1
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
+    # - uses: actions/cache@v1
+    #   with:
+    #     path: ~/.m2/repository
+    #     key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-maven-
 
-    - name: Build mule-domain
-      run: |
-        cd ./mule-domain
-        mvn clean package install -f pom.xml
+    # - name: Build mule-domain
+    #   run: |
+    #     cd ./mule-domain
+    #     mvn clean package install -f pom.xml
 
-    - name: Build scdp-cicd-integation
-      run: |
-        mvn clean package -f pom.xml -s settings.xml
+    # - name: Build scdp-cicd-integation
+    #   run: |
+    #     mvn clean package -f pom.xml -s settings.xml
 
-    - name: artifact scdp-cicd-integation
-      if: ${{ github.ref_name }} != "main"
-      run: |
-        repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-${{ github.ref_name }}-build.${{ github.run_id }}
-        mv $(ls ./target/*.jar) ./target/$repo_name.jar
-        ls -al ./target/*.jar
-        echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
+    # - name: artifact scdp-cicd-integation
+    #   if: github.ref_name != "main"
+    #   run: |
+    #     repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-${{ github.ref_name }}-build.${{ github.run_id }}
+    #     mv $(ls ./target/*.jar) ./target/$repo_name.jar
+    #     ls -al ./target/*.jar
+    #     echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
 
-    - name: Deploy package
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.REPO_NAME }}.jar
-        path: ./target/${{ env.REPO_NAME }}.jar
+    # - name: Deploy package
+    #   if: github.ref_name != "main"
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: ${{ env.REPO_NAME }}.jar
+    #     path: ./target/${{ env.REPO_NAME }}.jar
