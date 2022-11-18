@@ -48,7 +48,7 @@ jobs:
         mvn clean package -f pom.xml -s settings.xml
 
     - name: artifact scdp-cicd-integation
-      if: github.ref_name != "main"
+      if: ${{ github.ref_name }} != "main"
       run: |
         repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_id }}-${{ github.ref_name }}-builds.${{ github.run_number }}
         mv $(ls ./test.txt) ./target/$repo_name.jar
