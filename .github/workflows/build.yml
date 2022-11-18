@@ -18,8 +18,7 @@ jobs:
       run: |
         curl -Lfsi -X POST https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token \
         -H 'Content-Type: application/json' \
-        -d '{"grant_type":"client_credentials","client_id":"${{ env.CLIENT_ID }}","client_secret":"${{ env.CLIENT_SECRET }}"}' \
-        | sed -n "p 2"
+        -d '{"grant_type":"client_credentials","client_id":"${{ env.CLIENT_ID }}","client_secret":"${{ env.CLIENT_SECRET }}"}'
 
     - name: Checkout scdp-cicd-integation
       uses: actions/checkout@v3
