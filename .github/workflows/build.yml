@@ -31,12 +31,29 @@ jobs:
         path: ./mule-domain
         ref: main
 
+    - name: Convert pom.xml to json
+      uses: fabasoad/data-format-converter-action@main
+      id: yaml2json
+      with:
+        input: ./pom.xml
+        from: xml
+        to: json
+
+    - name: Print result
+      run: echo "${{ steps.yaml2json.outputs.output }}"
+
     - name: Setup jdk8
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '8'
-        cache: 'maven'
+
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
 
     - name: Build mule-domain
       run: |
@@ -46,17 +63,6 @@ jobs:
     - name: Build scdp-cicd-integation
       run: |
         mvn clean package -f pom.xml -s settings.xml
-
-    - name: Convert pom.xml to json
-      uses: fabasoad/data-format-converter-action@main
-      id: yaml2json
-      with:
-        input: pom.xml
-        from: 'yaml'
-        to: 'json'
-
-    - name: Print result
-      run: echo "${{ steps.yaml2json.outputs.output }}"
 
     - name: artifact scdp-cicd-integation
       if: ${{ github.ref_name }} != "main"
