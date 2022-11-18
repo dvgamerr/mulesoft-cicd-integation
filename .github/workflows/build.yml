@@ -31,7 +31,7 @@ jobs:
         path: ./mule-domain
         ref: main
 
-    - name: Convert pom.xml to json
+    - name: Convert pom.xml to jso
       uses: fabasoad/data-format-converter-action@main
 
     - name: Print result
