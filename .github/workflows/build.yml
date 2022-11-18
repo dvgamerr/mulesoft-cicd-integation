@@ -40,7 +40,7 @@ jobs:
         to: json
 
     - name: Print result
-      run: echo "${{ steps.yaml2json.outputs.output }}"
+      run: echo "${{ steps.yaml2json.outputs.output }}" | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}") | .version'
 
     - name: Setup jdk8
       uses: actions/setup-java@v3
