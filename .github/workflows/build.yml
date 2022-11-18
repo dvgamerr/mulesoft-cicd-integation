@@ -36,15 +36,18 @@ jobs:
 
     - name: Convert pom.xml to json
       uses: fabasoad/data-format-converter-action@main
-      id: yaml2json
+      id: convert
       with:
         input: ./pom.xml
         from: xml
         to: json
     - name: Fixed data-format-converter-action write to pom.josn
+      run: echo '${{ steps.convert.outputs.output }}' > pom.json
       shell: sh
-      run: echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
         
+    - name: Print Result
+      run: cat pom.json 
+      
     - name: Get API Version in dependency
       run: |
         version=$(cat pom.json | jq '.project.dependencies.dependency | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
