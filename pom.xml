@@ -13,7 +13,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<application.name>scgp-cicd-integation</application.name>
 		<app.runtime>4.4.0-20221111</app.runtime>
 		<mule.maven.plugin.version>3.8.0</mule.maven.plugin.version>
 	</properties>
@@ -46,13 +45,13 @@
 						<connectedAppClientId>${mulesoft.client.id}</connectedAppClientId>
 						<connectedAppClientSecret>${mulesoft.client.secret}</connectedAppClientSecret>
 						<connectedAppGrantType>client_credentials</connectedAppGrantType>
-						<applicationName>${application.name}</applicationName>
-						<environment>Sandbox</environment>
+						<applicationName>${env.APP_ID}</applicationName>
+						<environment>${env.ENVIRONMENT}</environment>
 						<workers>1</workers>
 						<workerType>MICRO</workerType>
 						<objectStoreV2>true</objectStoreV2>
 						<region>us-east-2</region>
-						<businessGroupId>a83e599e-304b-4c4f-841a-dec3c177dee7</businessGroupId>
+						<businessGroupId>${env.ORGANIZATION_ID}</businessGroupId>
 					</cloudHubDeployment>
 				</configuration>
 			</plugin>
