@@ -50,4 +50,4 @@ jobs:
         mvn clean package install -f pom.xml
 
     - name: Deploy package
-      run: ls target/*.jar
+      run: ls ./mule-domain/target/*.jar
