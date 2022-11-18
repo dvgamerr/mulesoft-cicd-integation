@@ -47,11 +47,22 @@ jobs:
       run: |
         mvn clean package -f pom.xml -s settings.xml
 
+    - name: Convert pom.xml to json
+      uses: fabasoad/data-format-converter-action@main
+      id: yaml2json
+      with:
+        input: pom.xml
+        from: 'yaml'
+        to: 'json'
+
+    - name: Print result
+      run: echo "${{ steps.yaml2json.outputs.output }}"
+
     - name: artifact scdp-cicd-integation
       if: ${{ github.ref_name }} != "main"
       run: |
-        repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_id }}-${{ github.ref_name }}-builds.${{ github.run_number }}
-        mv $(ls ./test.txt) ./target/$repo_name.jar
+        repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-${{ github.ref_name }}-build.${{ github.run_id }}
+        mv $(ls ./target/*.jar) ./target/$repo_name.jar
         ls -al ./target/*.jar
         echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
 

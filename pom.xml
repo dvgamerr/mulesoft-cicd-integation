@@ -16,14 +16,13 @@
 		<application.name>scgp-cicd-integation</application.name>
 		<app.runtime>4.4.0-20221111</app.runtime>
 		<mule.maven.plugin.version>3.8.0</mule.maven.plugin.version>
-		<mulesoft.organization>a83e599e-304b-4c4f-841a-dec3c177dee7</mulesoft.organization>
 	</properties>
 
 	<distributionManagement>
 		<repository>
 			<id>anypoint-exchange-v3</id>
 			<name>Corporate Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/${mulesoft.organization}/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/a83e599e-304b-4c4f-841a-dec3c177dee7/maven</url>
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
@@ -53,7 +52,7 @@
 						<workerType>MICRO</workerType>
 						<objectStoreV2>true</objectStoreV2>
 						<region>us-east-2</region>
-						<businessGroupId>${mulesoft.organization}</businessGroupId>
+						<businessGroupId>a83e599e-304b-4c4f-841a-dec3c177dee7</businessGroupId>
 					</cloudHubDeployment>
 				</configuration>
 			</plugin>
@@ -68,7 +67,7 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>${mulesoft.organization}</groupId>
+			<groupId>a83e599e-304b-4c4f-841a-dec3c177dee7</groupId>
 			<artifactId>scgp-cicd-integation</artifactId>
 			<version>1.0.0</version>
 			<classifier>raml</classifier>
