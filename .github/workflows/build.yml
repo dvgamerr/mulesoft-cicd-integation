@@ -7,15 +7,18 @@ on:
     tags:
       - "v*"
 
+env:
+  CLIENT_ID: ${{ secrets.CLIENT_ID }}
+  CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+  ORGANIZATION_ID: ${{ secrets.ORGANIZATION_ID }}
+  ENVIRONMENT: Sandbox
+  APP_ID: scgp-cicd-integation
+  EXCHANGE_VERSION: v0.0.0
+  REPO_NAME: unknow
+      
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-      ORGANIZATION_ID: ${{ secrets.ORGANIZATION_ID }}
-      ENVIRONMENT: Sandbox
-      APP_ID: scgp-cicd-integation
 
     steps:
 
@@ -41,25 +44,14 @@ jobs:
         input: ./pom.xml
         from: xml
         to: json
-    - name: Fixed data-format-converter-action write to pom.josn
-      run: echo '${{ steps.convert.outputs.output }}' > pom.json
-      shell: sh
 
     - name: Set Environment Name
       run: |
-        version=v$(cat pom.json | jq '.project.dependencies.dependency[] | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
+        version=v$(echo '${{ steps.convert.outputs.output }}' | jq '.project.dependencies.dependency[] | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
         repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-$version-build.${{ github.ref_name }}#${{ github.run_id }}
         
         echo "EXCHANGE_VERSION=$version" >> $GITHUB_ENV
         echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
-
-    - name: Install anypoint-cli-v4 and Config
-      run: |
-        npm i -g anypoint-cli-v4
-        anypoint-cli-v4 conf client_id ${{ env.CLIENT_ID }}
-        anypoint-cli-v4 conf client_secret ${{ env.CLIENT_SECRET }}
-        anypoint-cli-v4 conf organization ${{ env.ORGANIZATION_ID }}
-        anypoint-cli-v4 conf environment ${{ env.ENVIRONMENT }}
 
     - name: Setup jdk8
       uses: actions/setup-java@v3
@@ -82,25 +74,35 @@ jobs:
     - name: Build scdp-cicd-integation
       run: |
         mvn clean package -f pom.xml -s settings.xml
-
-    - name: artifact scdp-cicd-integation
-      # if: github.ref_name != "main"
-      run: |
-        repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-${{ env.API_VERSION }}-build.${{ github.ref_name }}-${{ github.run_id }}
-        echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
-        mv $(ls ./target/*.jar) ./target/$repo_name.jar
+        mv $(ls ./target/*.jar) ./target/${{ env.REPO_NAME }}.jar
         ls -al ./target/*.jar
-        echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
 
-    - name: Deploy package
+    - name: Upload artifact package
       # if: github.ref_name != "main"
       uses: actions/upload-artifact@v3
       with:
         name: ${{ env.REPO_NAME }}
         path: ./target/${{ env.REPO_NAME }}.jar
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Download artifact package
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.REPO_NAME }}
+
+    - name: Install anypoint-cli-v4 and Config
+      run: |
+        npm i -g anypoint-cli-v4
+        anypoint-cli-v4 conf client_id ${{ env.CLIENT_ID }}
+        anypoint-cli-v4 conf client_secret ${{ env.CLIENT_SECRET }}
+        anypoint-cli-v4 conf organization ${{ env.ORGANIZATION_ID }}
+        anypoint-cli-v4 conf environment ${{ env.ENVIRONMENT }}
+        
     - name: Deploy Aticatct to CouldAppilication
-      # if: github.ref_name != "main"
       run: |
         echo anypoint-cli-v4 runtime-mgr:cloudhub-application:modify \
         ${{ env.APP_ID }} /target/${{ env.REPO_NAME }}.jar -o json
+        
