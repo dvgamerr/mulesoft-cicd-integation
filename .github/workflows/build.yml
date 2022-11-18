@@ -41,7 +41,7 @@ jobs:
 
     - name: Print result
       run: |
-        yq -P './pom.xml' -p=xml -o=json > pom.json
+        echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
         cat pom.json | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
 
     - name: Install anypoint-cli-v4
