@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - "main"
+    tags:
+      - "v*"
 
 jobs:
   build:
@@ -17,43 +19,44 @@ jobs:
     - name: Verify Client Credentials
       run: |
         curl -Lfsi -X POST https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token -H 'Content-Type: application/json' \
-        -d '{"grant_type":"client_credentials","client_id":"${{ env.CLIENT_ID }}","client_secret":"${{ env.CLIENT_SECRET }}"}' -o ./test.txt
+        -d '{"grant_type":"client_credentials","client_id":"${{ env.CLIENT_ID }}","client_secret":"${{ env.CLIENT_SECRET }}"}'
 
     - name: Checkout scdp-cicd-integation
       uses: actions/checkout@v3
 
-    # - name: Checkout mulesoft-scgp-api
-    #   uses: actions/checkout@v3
-    #   with:
-    #     repository: dvgamerr/scgp-mule-domain
-    #     path: ./mule-domain
-    #     ref: main
+    - name: Checkout mulesoft-scgp-api
+      uses: actions/checkout@v3
+      with:
+        repository: dvgamerr/scgp-mule-domain
+        path: ./mule-domain
+        ref: main
 
-    # - name: Setup jdk8
-    #   uses: actions/setup-java@v3
-    #   with:
-    #     distribution: 'temurin'
-    #     java-version: '8'
-    #     cache: 'maven'
+    - name: Setup jdk8
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '8'
+        cache: 'maven'
 
-    # - name: Build mule-domain
-    #   run: |
-    #     cd ./mule-domain
-    #     mvn clean package install -f pom.xml
+    - name: Build mule-domain
+      run: |
+        cd ./mule-domain
+        mvn clean package install -f pom.xml
 
-    # - name: Build scdp-cicd-integation
-    #   run: |
-    #     mvn clean package -f pom.xml -s settings.xml
+    - name: Build scdp-cicd-integation
+      run: |
+        mvn clean package -f pom.xml -s settings.xml
 
     - name: artifact scdp-cicd-integation
+      if: github.ref_name !== "main"
       run: |
-        repo_name=${GITHUB_REPOSITORY#*/}-${{ github.ref_name }}-$${{ github.run_number }}
-        mv $(ls ./target/*.jar) ./target/$repo_name.jar
+        repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_id }}-${{ github.ref_name }}-builds.${{ github.run_number }}
+        mv $(ls ./test.txt) ./target/$repo_name.jar
         ls -al ./target/*.jar
         echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
 
     - name: Deploy package
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.REPO_NAME }}
-        path: ./test.txt
+        name: ${{ env.REPO_NAME }}.jar
+        path: ./target/${{ env.REPO_NAME }}.jar
