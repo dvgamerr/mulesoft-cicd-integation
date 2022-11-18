@@ -29,13 +29,6 @@ jobs:
         repository: dvgamerr/scgp-mule-domain
         path: ./mule-domain
         ref: main
-    
-    - uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
 
     - name: Setup jdk8
       uses: actions/setup-java@v3
@@ -49,5 +42,13 @@ jobs:
         cd ./mule-domain
         mvn clean package install -f pom.xml
 
+    - name: Build scdp-cicd-integation
+      run: |
+        mvn clean package -f pom.xml -s settings.xml
+        mv $(ls target/*.jar) ./target/${GITHUB_REPOSITORY#*/}-$GITHUB_REF_NAME-$GITHUB_JOB.jar
+
     - name: Deploy package
-      run: ls ./mule-domain/target/*.jar
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${GITHUB_REPOSITORY#*/}
+        path: ./target/*.jar
