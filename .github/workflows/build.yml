@@ -47,14 +47,13 @@ jobs:
 
     - name: Build scdp-cicd-integation
       run: |
-        repo_name=${GITHUB_REPOSITORY#*/}
-        mv $(ls ./target/*.jar) ./target/$repo_name-$GITHUB_REF_NAME-$GITHUB_JOB.jar
+        repo_name=${GITHUB_REPOSITORY#*/}-${GITHUB_REF_NAME}-${GITHUB_JOB}
+        mv $(ls ./target/*.jar) ./target/$repo_name.jar
         ls -al ./target/*.jar
         echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
-
 
     - name: Deploy package
       uses: actions/upload-artifact@v3
       with:
         name: ${{ env.REPO_NAME }}
-        path: ./target/*.jar
+        path: ./target/${{ env.REPO_NAME }}.jar
