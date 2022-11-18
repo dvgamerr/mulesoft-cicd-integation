@@ -41,8 +41,7 @@ jobs:
 
     - name: Print result
       run: |
-        echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
-        cat pom.json | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
+        cat .data-format-converter-action | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
 
     # - name: Setup jdk8
     #   uses: actions/setup-java@v3
