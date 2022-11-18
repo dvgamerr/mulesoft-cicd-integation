@@ -47,7 +47,7 @@ jobs:
 
     - name: Set Environment Name
       run: |
-        version=v$(echo '${{ steps.convert.outputs.output }}' | jq '.project.dependencies.dependency[] | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
+        version=v$(echo '${{ steps.convert.outputs.output }}' | jq -r '.project.dependencies.dependency[] | select(.groupId == "${{ env.ORGANIZATION_ID }}") | .version')
         repo_name=${GITHUB_REPOSITORY#*/}#${{ github.run_number }}-$version-build.${{ github.ref_name }}#${{ github.run_id }}
         
         echo "EXCHANGE_VERSION=$version" >> $GITHUB_ENV
@@ -84,14 +84,14 @@ jobs:
         name: ${{ env.REPO_NAME }}
         path: ./target/${{ env.REPO_NAME }}.jar
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - name: Download artifact package
-      uses: actions/download-artifact@v3
-      with:
-        name: ${{ env.REPO_NAME }}
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   steps:
+  #   - name: Download artifact package
+  #     uses: actions/download-artifact@v3
+  #     with:
+  #       name: ${{ env.REPO_NAME }}
 
     - name: Install anypoint-cli-v4 and Config
       run: |
