@@ -34,18 +34,19 @@ jobs:
         path: ./mule-domain
         ref: main
 
-    # - name: Convert pom.xml to json
-    #   uses: fabasoad/data-format-converter-action@main
-    #   id: yaml2json
-    #   with:
-    #     input: ./pom.xml
-    #     from: xml
-    #     to: json
+    - name: Convert pom.xml to json
+      uses: fabasoad/data-format-converter-action@main
+      id: yaml2json
+      with:
+        input: ./pom.xml
+        from: xml
+        to: json
 
-    # - name: Print result
-    #   run: |
-    #     echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
-    #     cat pom.json | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
+    - name: Print result
+      shell: sh
+      run: |
+        echo "${{ steps.yaml2json.outputs.output }}" > ./pom.json
+        cat pom.json | jq '.project.dependencies.dependency | select(.id == "${{ env.ORGANIZATION_ID }}")'
 
     - name: Install anypoint-cli-v4 and Config
       run: |
