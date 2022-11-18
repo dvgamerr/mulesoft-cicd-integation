@@ -61,7 +61,7 @@ jobs:
         distribution: 'temurin'
         java-version: '8'
 
-    - uses: actions/cache@v1
+    - uses: actions/cache@v3
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -89,12 +89,11 @@ jobs:
       # if: github.ref_name != "main"
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.REPO_NAME }}.jar
+        name: ${{ env.REPO_NAME }}
         path: ./target/${{ env.REPO_NAME }}.jar
 
     - name: Deploy Aticatct to CouldAppilication
       # if: github.ref_name != "main"
       run: |
         echo anypoint-cli-v4 runtime-mgr:cloudhub-application:modify \
-        ${{ env.APP_ID }} \
-        ./target/v2-scgp-cicd-integation-1.0.0-SNAPSHOT-mule-application.jar -o json
+        ${{ env.APP_ID }} /target/${{ env.REPO_NAME }}.jar -o json
