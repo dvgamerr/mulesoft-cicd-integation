@@ -9,7 +9,18 @@
 
 <properties>
   <application.name>scgp-cicd-integation</application.name>
+  <mulesoft.organization>${mule.organization.id}</mulesoft.organization>
 </properties>
+
+<distributionManagement>
+  <repository>
+    <id>anypoint-exchange-v3</id>
+    <name>Corporate Repository</name>
+    <url>https://maven.anypoint.mulesoft.com/api/v3/organizations/${mule.organization.id}/maven</url>
+    <layout>default</layout>
+  </repository>
+</distributionManagement>
+
 
 <build>
   <plugins>
@@ -103,3 +114,9 @@
   </profiles>
 </settings>
 ```
+
+### Referance
+- https://docs.mulesoft.com/exchange/connected-app-authentication
+- hhttps://mulesoft-labs.dev/codelabs/cicd-with-github-actions/index.html#3
+- https://help.mulesoft.com/s/question/0D52T00005JWeXhSAL/connected-apps-and-tokens
+- https://www.linkedin.com/pulse/mulesoft-cicd-github-actions-pralay-debroy

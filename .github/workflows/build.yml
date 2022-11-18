@@ -12,27 +12,23 @@ jobs:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       ORGANIZATION_ID: ${{ secrets.ORGANIZATION_ID }}
-      OAUTH2: https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token
-      ACCESS_TOKEN: "GENERATE_OAUTH2"
     steps:
-
-    - name: Checkout
-      uses: actions/checkout@v2
 
     - name: Verify Client Credentials
       run: |
-        echo "ACCESS_TOKEN=$(curl -sL -X POST $OAUTH2 -H "Content-Type: application/x-www-form-urlencoded" \
-        --data-urlencode "client_id=$CLIENT_ID" \
-        --data-urlencode "client_secret=$CLIENT_SECRET" \
-        --data-urlencode "grant_type=client_credentials" | jq .'access_token')" >> $GITHUB_ENV
+        curl -Lifs -X POST https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token \
+        -H 'Content-Type: application/json' \
+        -d '{"grant_type":"client_credentials","client_id":"${{ env.CLIENT_ID }}","client_secret":"${{ env.CLIENT_SECRET }}"}'
 
-#     - name: Clone mulesoft-scgp-api
-#       uses: actions/checkout@v2
-#       with:
-#         repository: scg-wedo-dev-ex/mulesoft-scgp-api
-#         token: ${{ secrets.GH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
-#         path: ./mulesoft
-#         ref: main
+    - name: Checkout scdp-cicd-integation
+      uses: actions/checkout@v2
+
+    - name: Checkout mulesoft-scgp-api
+      uses: actions/checkout@v2
+      with:
+        repository: dvgamerr/scgp-mule-domain
+        path: ./mule-domain
+        ref: main
     
     - uses: actions/cache@v3
       with:
@@ -48,55 +44,10 @@ jobs:
         java-version: '8'
         cache: 'maven'
 
-    - name: Maven Settings
-      uses: whelk-io/maven-settings-xml-action@v16
-      with:
-        repositories: |
-              [
-                {
-                  "id": "MuleRepository",
-                  "name": "MuleRepository",
-                  "url": "https://repository.mulesoft.org/nexus-ee/content/repositories/releases-ee/",
-                  "releases": {
-                    "enabled": "true"
-                  },
-                  "snapshots": {
-                    "enabled": "true"
-                  }
-                }
-              ]
-        servers: |
-              [
-                {
-                  "id": "anypoint-exchange-v2",
-                  "username": "~~~Token~~~",
-                  "password": "1a602cfe-cb20-42c7-92ca-a6f870a75e6e",
-                  "configuration": {
-                    "httpConfiguration": {
-                      "all": {
-                        "usePreemptive": "true"
-                      }
-                    }
-                  }
-                },
-                {
-                  "id": "MuleRepository",
-                  "username": "${{ secrets.ENT_ID }}",
-                  "password": "${{ secrets.ENT_PASSWORD }}",
-                  "configuration": {
-                    "httpConfiguration": {
-                      "all": {
-                        "usePreemptive": "true"
-                      }
-                    }
-                  }
-                }
-              ]      
-        
+    - name: Build mule-domain
+      run: |
+        cd ./mule-domain
+        mvn clean package install -f pom.xml
 
-    - name: Build package
-      # run: mvn -B package -DauthToken=${{ env.ACCESS_TOKEN }} -s settings.xml
-      run: mvn clean package
-    
     - name: Deploy package
       run: ls target/*.jar
