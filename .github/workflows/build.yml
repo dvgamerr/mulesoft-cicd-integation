@@ -103,6 +103,6 @@ jobs:
         
     - name: Deploy Aticatct to CouldAppilication
       run: |
-        echo anypoint-cli-v4 runtime-mgr:cloudhub-application:modify \
+        anypoint-cli-v4 runtime-mgr:cloudhub-application:modify \
         ${{ env.APP_ID }} /target/${{ env.REPO_NAME }}.jar -o json
         
