@@ -45,7 +45,7 @@
 						<muleVersion>${app.runtime}</muleVersion>
 						<connectedAppClientId>${mulesoft.client.id}</connectedAppClientId>
 						<connectedAppClientSecret>${mulesoft.client.secret}</connectedAppClientSecret>
-						<connectedAppGrantType/>
+						<connectedAppGrantType>client_credentials</connectedAppGrantType>
 						<applicationName>${application.name}</applicationName>
 						<environment>Sandbox</environment>
 						<workers>1</workers>

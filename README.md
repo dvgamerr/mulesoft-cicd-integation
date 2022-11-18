@@ -117,6 +117,6 @@
 
 ### Referance
 - https://docs.mulesoft.com/exchange/connected-app-authentication
-- hhttps://mulesoft-labs.dev/codelabs/cicd-with-github-actions/index.html#3
+- https://mulesoft-labs.dev/codelabs/cicd-with-github-actions/index.html#3
 - https://help.mulesoft.com/s/question/0D52T00005JWeXhSAL/connected-apps-and-tokens
 - https://www.linkedin.com/pulse/mulesoft-cicd-github-actions-pralay-debroy
