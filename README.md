@@ -1,6 +1,8 @@
 # scgp-cicd-integation
 [![Mulesoft Package](https://github.com/dvgamerr/scgp-cicd-integation/actions/workflows/build.yml/badge.svg)](https://github.com/dvgamerr/scgp-cicd-integation/actions/workflows/build.yml)
 
+- Domain Project [scgp-mule-domain](https://github.com/dvgamerr/scgp-mule-domain)
+
 ### Config build and deploy
 
 - `pom.xml` Add config.
