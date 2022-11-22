@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
-    <http:listener-config name="scgp-cicd-integation-httpListenerConfig">
-        <http:listener-connection host="0.0.0.0" port="8081" />
-    </http:listener-config>
-    <apikit:config name="scgp-cicd-integation-config" api="resource::a83e599e-304b-4c4f-841a-dec3c177dee7:scgp-cicd-integation:1.0.0:raml:zip:scgp-cicd-integation.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <flow name="scgp-cicd-integation-main">
-        <http:listener config-ref="scgp-cicd-integation-httpListenerConfig" path="/api/*">
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="cicd-basic-api-health-config" api="resource::cb2a4d97-b91a-47bb-9eb0-9a97b16ff2a5:cicd-basic-api-health:1.0.0:raml:zip:cicd-basic-api-health.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="cicd-basic-api-health-main">
+        <http:listener config-ref="ExperienceAPIConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:response>
@@ -14,7 +11,7 @@
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="scgp-cicd-integation-config" />
+        <apikit:router config-ref="cicd-basic-api-health-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform>
@@ -96,8 +93,8 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="scgp-cicd-integation-console">
-        <http:listener config-ref="scgp-cicd-integation-httpListenerConfig" path="/console/*">
+    <flow name="cicd-basic-api-health-console">
+        <http:listener config-ref="ExperienceAPIConfig" path="/console/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:response>
@@ -106,7 +103,7 @@ output application/json
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:console config-ref="scgp-cicd-integation-config" />
+        <apikit:console config-ref="cicd-basic-api-health-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:NOT_FOUND">
                 <ee:transform>
@@ -123,7 +120,12 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="get:\health:scgp-cicd-integation-config">
-        <logger level="INFO" message="get:\health:scgp-cicd-integation-config" />
+    <flow name="get:\health:cicd-basic-api-health-config">
+        <logger level="INFO" message="get:\health:cicd-basic-api-health-config" />
+		<ee:transform doc:name="Transform Message" doc:id="5a2a2ad1-a3d4-4573-8ecd-b0ae10996ace" >
+			<ee:message >
+				<ee:set-payload resource="get-health/1-response.dwl" />
+			</ee:message>
+		</ee:transform>
     </flow>
 </mule>
