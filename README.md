@@ -1,7 +1,7 @@
-# scgp-cicd-integation
-[![Mulesoft Package](https://github.com/dvgamerr/scgp-cicd-integation/actions/workflows/build.yml/badge.svg)](https://github.com/dvgamerr/scgp-cicd-integation/actions/workflows/build.yml)
+# mulesoft-cicd-integation
+[![Mulesoft Package](https://github.com/dvgamerr/mulesoft-cicd-integation/actions/workflows/build.yml/badge.svg)](https://github.com/dvgamerr/mulesoft-cicd-integation/actions/workflows/build.yml)
 
-- Domain Project [scgp-mule-domain](https://github.com/dvgamerr/scgp-mule-domain)
+- Domain Project [mulesoft-mule-domain](https://github.com/dvgamerr/mulesoft-mule-domain)
 
 ### Config build and deploy
 
