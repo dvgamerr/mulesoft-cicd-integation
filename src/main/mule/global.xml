@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="dbe552a3-a287-42db-9e6e-36abd0c19dd6" file="config-${env}.yaml" />
+	<configuration doc:name="Configuration" doc:id="ca5cc60b-3fbb-4c87-a88e-ad25923ff4da" defaultErrorHandler-ref="globalError_Handler" />
+	<api-gateway:autodiscovery apiId="${autoDiscoveryId}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="96e20fc1-52d3-45fc-9a7c-83f0a698dc07" flowRef="cicd-integrate-main" />
+	<error-handler name="globalError_Handler" doc:id="526fce09-6c96-4555-bfc6-c79d484135f4" >
+		<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="f154f190-7cf9-4855-bc45-773d57ea2981" type="ANY" >
+			<ee:transform doc:name="INTERNAL SERVER ERROR" doc:id="61bf7912-217e-41de-a7a7-ace9355f4a76" >
+				<ee:message >
+					<ee:set-payload resource="global/error-http-response.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable resource="global/error-http-status.dwl" variableName="httpStatus" />
+				</ee:variables>
+			</ee:transform>
+			<logger level="ERROR" doc:name="log-response" doc:id="47f33689-84a7-4115-9d2b-174295ac5285" message="#[{(vars.meta), response: payload}]" category="scg.wedo.local" />
+		</on-error-propagate>
+	</error-handler>
+</mule>

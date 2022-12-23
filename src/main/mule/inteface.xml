@@ -1,99 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
-    <apikit:config name="cicd-basic-api-health-config" api="resource::cb2a4d97-b91a-47bb-9eb0-9a97b16ff2a5:cicd-basic-api-health:1.0.0:raml:zip:cicd-basic-api-health.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <flow name="cicd-basic-api-health-main">
-        <http:listener config-ref="ExperienceAPIConfig" path="/api/*">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="cicd-integrate-config" api="resource::cb2a4d97-b91a-47bb-9eb0-9a97b16ff2a5:cicd-integrate:1.0.0:raml:zip:cicd-integrate.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="cicd-integrate-main">
+        <http:listener config-ref="ExperienceAPIConfig" path="/cicd/api/v1/*">
+            <ee:repeatable-file-store-stream inMemorySize="2" bufferUnit="MB" />
             <http:response statusCode="#[vars.httpStatus default 200]">
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[vars.httpStatus default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="cicd-basic-api-health-config" />
+        <apikit:router config-ref="cicd-integrate-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform>
                     <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Bad request"}]]></ee:set-payload>
+                        <ee:set-payload resource="global/error-bad-request.dwl" />
                     </ee:message>
                     <ee:variables>
-                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                        <ee:set-variable resource="global/error-bad-request-status.dwl" variableName="httpStatus" />
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_FOUND">
                 <ee:transform>
                     <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Resource not found"}]]></ee:set-payload>
+                        <ee:set-payload resource="global/error-not-found.dwl" />
                     </ee:message>
                     <ee:variables>
-                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                        <ee:set-variable resource="global/error-not-found-status.dwl" variableName="httpStatus" />
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
                 <ee:transform>
                     <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Method not allowed"}]]></ee:set-payload>
+                        <ee:set-payload resource="global/error-method-not-allowed.dwl" />
                     </ee:message>
                     <ee:variables>
-                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                        <ee:set-variable resource="global/error-method-not-allowed-status.dwl" variableName="httpStatus" />
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
                 <ee:transform>
                     <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Not acceptable"}]]></ee:set-payload>
+                        <ee:set-payload resource="global/error-not-acceptable.dwl" />
                     </ee:message>
                     <ee:variables>
-                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                        <ee:set-variable resource="global/error-not-acceptable-status.dwl" variableName="httpStatus" />
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
                 <ee:transform>
                     <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Unsupported media type"}]]></ee:set-payload>
+                        <ee:set-payload resource="global/error-unsupported.dwl" />
                     </ee:message>
                     <ee:variables>
-                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                        <ee:set-variable resource="global/error-unsupported-status.dwl" variableName="httpStatus" />
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
                 <ee:transform>
                     <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Not Implemented"}]]></ee:set-payload>
+                        <ee:set-payload resource="global/error-not-implemented.dwl" />
                     </ee:message>
                     <ee:variables>
-                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                        <ee:set-variable resource="global/error-not-implemented-status.dwl" variableName="httpStatus" />
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="cicd-basic-api-health-console">
+    <flow name="cicd-integrate-console">
         <http:listener config-ref="ExperienceAPIConfig" path="/console/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
@@ -103,29 +86,56 @@ output application/json
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:console config-ref="cicd-basic-api-health-config" />
+        <apikit:console config-ref="cicd-integrate-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:NOT_FOUND">
                 <ee:transform>
                     <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Resource not found"}]]></ee:set-payload>
+                        <ee:set-payload resource="global/error-not-found.dwl" />
                     </ee:message>
                     <ee:variables>
-                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                        <ee:set-variable resource="global/error-not-found-status.dwl" variableName="httpStatus" />
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="get:\health:cicd-basic-api-health-config">
-        <logger level="INFO" message="get:\health:cicd-basic-api-health-config" />
-		<ee:transform doc:name="Transform Message" doc:id="5a2a2ad1-a3d4-4573-8ecd-b0ae10996ace" >
-			<ee:message >
-				<ee:set-payload resource="get-health/1-response.dwl" />
-			</ee:message>
-		</ee:transform>
+    <flow name="put:\gocd\(runtimeName)\promote:cicd-integrate-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="runtimeName">attributes.uriParams.'runtimeName'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="put:\gocd\(runtimeName)\promote:cicd-integrate-config" />
+    </flow>
+    <flow name="put:\gocd\(runtimeName)\rebuild:cicd-integrate-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="runtimeName">attributes.uriParams.'runtimeName'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="put:\gocd\(runtimeName)\rebuild:cicd-integrate-config" />
+    </flow>
+    <flow name="get:\health:cicd-integrate-config">
+        <logger level="INFO" message="get:\health:cicd-integrate-config" />
+    </flow>
+    <flow name="get:\gocd\(runtimeName):cicd-integrate-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="runtimeName">attributes.uriParams.'runtimeName'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\gocd\(runtimeName):cicd-integrate-config" />
+    </flow>
+    <flow name="post:\webhook\github:cicd-integrate-config">
+        <logger level="INFO" message="post:\webhook\github:cicd-integrate-config" />
+    </flow>
+    <flow name="post:\gocd\(runtimeName)\refresh:cicd-integrate-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="runtimeName">attributes.uriParams.'runtimeName'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="post:\gocd\(runtimeName)\refresh:cicd-integrate-config" />
     </flow>
 </mule>

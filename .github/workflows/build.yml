@@ -12,7 +12,7 @@ env:
   CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
   ORGANIZATION_ID: ${{ secrets.ORGANIZATION_ID }}
   ENVIRONMENT: Sandbox
-  APP_ID: scgp-cicd-integation
+  APP_ID: cicd-integration
   EXCHANGE_VERSION: v0.0.0
   REPO_NAME: unknow
       
