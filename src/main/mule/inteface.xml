@@ -100,15 +100,35 @@
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="put:\gocd\(runtimeName)\promote:cicd-integrate-config">
+    <flow name="get:\health:cicd-integrate-config">
+		<ee:transform doc:name="Transform Message" doc:id="509eb44a-347c-4854-b4f8-39c9585ed054" >
+			<ee:variables >
+				<ee:set-variable variableName="runtimeName" ><![CDATA[{
+	ok: true
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+    </flow>
+    <flow name="post:\webhook\github:cicd-integrate-config">
+		<ee:transform doc:name="Transform Message" doc:id="0066b45b-ffd7-45fc-801b-6b35cb1ea8be" >
+			<ee:variables >
+				<ee:set-variable variableName="runtimeName" ><![CDATA[{
+	ok: true
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+    </flow>
+	<flow name="get:\gocd\(runtimeName):cicd-integrate-config">
         <ee:transform>
             <ee:variables>
-                <ee:set-variable variableName="runtimeName">attributes.uriParams.'runtimeName'</ee:set-variable>
+                <ee:set-variable variableName="runtimeName"><![CDATA[{
+	runtimeName: attributes.uriParams.runtimeName,
+	ok: true
+}]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <logger level="INFO" message="put:\gocd\(runtimeName)\promote:cicd-integrate-config" />
     </flow>
-    <flow name="put:\gocd\(runtimeName)\rebuild:cicd-integrate-config">
+	<flow name="put:\gocd\(runtimeName)\rebuild:cicd-integrate-config">
         <ee:transform>
             <ee:variables>
                 <ee:set-variable variableName="runtimeName">attributes.uriParams.'runtimeName'</ee:set-variable>
@@ -116,26 +136,22 @@
         </ee:transform>
         <logger level="INFO" message="put:\gocd\(runtimeName)\rebuild:cicd-integrate-config" />
     </flow>
-    <flow name="get:\health:cicd-integrate-config">
-        <logger level="INFO" message="get:\health:cicd-integrate-config" />
+	<flow name="post:\gocd\(runtimeName)\refresh:cicd-integrate-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="runtimeName"><![CDATA[{
+	runtimeName: attributes.uriParams.runtimeName,
+	ok: true
+}]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
     </flow>
-    <flow name="get:\gocd\(runtimeName):cicd-integrate-config">
+    <flow name="put:\gocd\(runtimeName)\promote:cicd-integrate-config">
         <ee:transform>
             <ee:variables>
                 <ee:set-variable variableName="runtimeName">attributes.uriParams.'runtimeName'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <logger level="INFO" message="get:\gocd\(runtimeName):cicd-integrate-config" />
-    </flow>
-    <flow name="post:\webhook\github:cicd-integrate-config">
-        <logger level="INFO" message="post:\webhook\github:cicd-integrate-config" />
-    </flow>
-    <flow name="post:\gocd\(runtimeName)\refresh:cicd-integrate-config">
-        <ee:transform>
-            <ee:variables>
-                <ee:set-variable variableName="runtimeName">attributes.uriParams.'runtimeName'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <logger level="INFO" message="post:\gocd\(runtimeName)\refresh:cicd-integrate-config" />
+        <logger level="INFO" message="put:\gocd\(runtimeName)\promote:cicd-integrate-config" />
     </flow>
 </mule>
